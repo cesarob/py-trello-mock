@@ -1,0 +1,9 @@
+version: "2"
+services:
+  trellomock:
+    build:
+      context: ../..
+      dockerfile: environment/dev/Dockerfile
+    working_dir: /app
+    volumes:
+      - ../..:/app
