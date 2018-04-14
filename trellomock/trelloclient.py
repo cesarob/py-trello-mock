@@ -17,8 +17,14 @@ class ResourceUnavailable(trello.exceptions.ResourceUnavailable):
 class TrelloClient(trelloclient.TrelloClient):
 
     def __init__(self):
-        self.boards = []
-        self.organizations = []
+        self.boards = {}
+        self.organizations = {}
+
+        # It makes sense to have at this level these indexes as trello api exposes them as global
+        # entities and also does py-trello. You could even retrieve a list using the id from a board that
+        # it isn't its
+        self.lists = {}
+        self.cards = {}
 
     def info_for_all_boards(self, actions):
         """
@@ -46,7 +52,7 @@ class TrelloClient(trelloclient.TrelloClient):
             - url: URL to the board
         """
         # TODO We are not applying filtering
-        return self.boards
+        return list(self.boards.values())
 
     def list_organizations(self):
         """
@@ -63,7 +69,7 @@ class TrelloClient(trelloclient.TrelloClient):
             - closed: Boolean representing whether this organization is closed or not
             - url: URL to the organization
         """
-        return self.organizations
+        return list(self.organizations.values())
 
     def get_organization(self, organization_id):
         """Get organization
@@ -78,13 +84,7 @@ class TrelloClient(trelloclient.TrelloClient):
 
         :rtype: Board
         """
-        # TODO check py-treo iface
-        board = None
-        for board in self.boards:
-            if board_id == board.id:
-                return board
-        if board is None:
-            raise ResourceUnavailable(self.__class__.__name__, board_id)
+        return self._get_entity('Board', board_id)
 
     def add_board(self, board_name, source_board=None, organization_id=None, permission_level='private'):
         """Create board
@@ -94,7 +94,7 @@ class TrelloClient(trelloclient.TrelloClient):
         :rtype: Board
         """
         board = Board(client=self, board_id=str(uuid4()), name=board_name)
-        self.boards.append(board)
+        self.boards[board.id] = board
         return board
 
     def get_member(self, member_id):
@@ -109,14 +109,14 @@ class TrelloClient(trelloclient.TrelloClient):
 
         :rtype: Card
         """
-        raise NotImplementedError()
+        return self._get_entity('Card', board_id)
 
     def get_list(self, list_id):
         """Get list
 
         :rtype: List
         """
-        raise NotImplementedError()
+        return self._get_entity('List', board_id)
 
     def get_label(self, label_id, board_id):
         """Get Label
@@ -167,3 +167,17 @@ class TrelloClient(trelloclient.TrelloClient):
         """
         # TODO
         raise NotImplementedError()
+
+    def _get_entity(self, type, id):
+        index = getattr(self, type.lower() + 's')
+        if id in index:
+            return index[id]
+        raise ResourceUnavailable(type, id)
+
+    #----- NON py-trello API
+
+    def add_list(self, list):
+        self.lists[list.id] = list
+
+    def add_card(self, card):
+        self.cards[card.id] = card
