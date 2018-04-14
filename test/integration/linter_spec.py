@@ -9,7 +9,7 @@ import os
 EXCLUDED_FILES = []
 
 # Add the local directories you wish to lint (example: 'src', 'config, 'test', etc)
-CHECKED_DIRS = ['twoboards', 'test']
+CHECKED_DIRS = ['trellomock', 'test']
 
 
 def root_path():
