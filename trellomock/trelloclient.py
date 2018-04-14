@@ -109,14 +109,14 @@ class TrelloClient(trelloclient.TrelloClient):
 
         :rtype: Card
         """
-        return self._get_entity('Card', board_id)
+        return self._get_entity('Card', card_id)
 
     def get_list(self, list_id):
         """Get list
 
         :rtype: List
         """
-        return self._get_entity('List', board_id)
+        return self._get_entity('List', list_id)
 
     def get_label(self, label_id, board_id):
         """Get Label

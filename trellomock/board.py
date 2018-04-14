@@ -2,8 +2,8 @@
 from uuid import uuid4
 
 import trello.board as board
-from trello import List
-from trello import Label
+from .trellolist import List
+from .label import Label
 
 
 class Board(board.Board):
@@ -38,7 +38,7 @@ class Board(board.Board):
         self.closed = False
 
     def get_list(self, list_id):
-        self.client.get_list(list_id)
+        return self.client.get_list(list_id)
 
     def get_lists(self, list_filter):
         """Get lists from filter
